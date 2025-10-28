@@ -1,13 +1,10 @@
 import { redirect } from "@sveltejs/kit";
 import { get } from "$lib/server/s3";
-import { S3_BUCKET } from "$env/static/private";
+import { isBrowser } from "$lib/util";
 import type { RequestHandler } from "./$types";
-import { GetObjectCommand, NoSuchKey } from "@aws-sdk/client-s3";
 
 export const GET: RequestHandler = async ({ request, params }) => {
-  const accept = request.headers.get("accept") ?? "";
-  const sec = request.headers.get("sec-fetch-mode") ?? "";
-  if (accept.includes("text/html") || sec.length > 0) {
+  if (isBrowser(request.headers)) {
     redirect(303, `/v/${params.file}/`);
   }
 

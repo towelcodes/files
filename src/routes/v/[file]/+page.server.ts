@@ -1,6 +1,21 @@
 import type { PageServerLoad } from "./$types";
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
+import { isBrowser } from "$lib/util";
+import { check } from "$lib/server/s3";
 
-export const load: PageServerLoad = async ({ params }) => {
-  error(404, "no upload");
+export const load: PageServerLoad = async ({ params, request }) => {
+  if (!isBrowser(request.headers)) {
+    redirect(303, `/u/${params.file}`);
+  }
+
+  // fetch the file
+  const exists = await check(`${params.file}`);
+
+  if (!exists) {
+    return error(404, "Not found");
+  }
+
+  return {
+    file: params.file,
+  };
 };

@@ -49,6 +49,21 @@ export async function get(key: string) {
   );
 }
 
+export async function check(key: string) {
+  try {
+    await client.send(
+      new HeadObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: key,
+      }),
+    );
+    return true;
+  } catch (err: any) {
+    if (err?.$metadata?.httpStatusCode === 404) return false;
+    throw err;
+  }
+}
+
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 export function createId(len = 5) {
   let out = "";

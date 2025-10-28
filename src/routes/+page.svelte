@@ -145,7 +145,7 @@
                         {(progress * 100).toPrecision(3)}%
                     </p>
                 {:else}
-                    <X class="ml-auto stroke-ctp-text" />
+                    <File class="ml-auto stroke-ctp-text" />
                     <p class="text-sm mr-auto">
                         {filename}
                     </p>
