@@ -9,13 +9,14 @@ export const load: PageServerLoad = async ({ params, request }) => {
   }
 
   // fetch the file
-  const exists = await check(`${params.file}`);
+  const res = await check(`${params.file}`);
 
-  if (!exists) {
+  if (res == false) {
     return error(404, "Not found");
   }
 
   return {
     file: params.file,
+    contentType: res.ContentType!!,
   };
 };
