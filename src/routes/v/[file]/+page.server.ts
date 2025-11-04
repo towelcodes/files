@@ -18,5 +18,6 @@ export const load: PageServerLoad = async ({ params, request }) => {
   return {
     file: params.file,
     contentType: res.ContentType!!,
+    lastModified: res.LastModified!!,
   };
 };

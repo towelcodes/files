@@ -1,4 +1,5 @@
 <script lang="ts">
+    import FileIcon from "$lib/FileIcon.svelte";
     import {
         TriangleAlert,
         Upload,
@@ -133,7 +134,7 @@
         >
             <div class="flex gap-2 *:my-auto">
                 {#if filename == ""}
-                    <File class="ml-auto stroke-ctp-subtext0" />
+                    <Upload class="ml-auto stroke-ctp-subtext0" />
                     <p class="italic text-ctp-subtext0 text-sm mr-auto">
                         [select a file]
                     </p>
