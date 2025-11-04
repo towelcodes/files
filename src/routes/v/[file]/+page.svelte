@@ -2,7 +2,6 @@
     import { Eye, Download, TriangleAlert } from "@lucide/svelte";
     import type { PageProps } from "./$types";
     let { data, form }: PageProps = $props();
-    import { page } from "$app/stores";
     console.log(data);
     console.log(form);
 </script>

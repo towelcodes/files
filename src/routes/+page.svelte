@@ -1,5 +1,4 @@
 <script lang="ts">
-    import FileIcon from "$lib/FileIcon.svelte";
     import {
         TriangleAlert,
         Upload,
