@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import {
         TriangleAlert,
         Upload,
@@ -24,8 +25,9 @@
 
         const req = new XMLHttpRequest();
         req.open("POST", "/api/upload");
+        req.responseType = "json";
 
-        await new Promise((resolve) => {
+        const res = await new Promise((resolve) => {
             req.upload.addEventListener("progress", (e) => {
                 if (e.lengthComputable) {
                     progress = e.loaded / e.total;
@@ -38,13 +40,21 @@
                 }
             });
             req.upload.addEventListener("loadend", () => {
-                resolve(null);
+                console.log("loadend");
+            });
+            req.addEventListener("readystatechange", () => {
+                console.log("readyState", req.readyState);
+                if (req.readyState == 4) {
+                    resolve(req.response);
+                }
             });
             req.send(fd);
         });
 
         console.log("completed: ", req.readyState, req.status);
+        // FIXME typescript errors
         progress = undefined;
+        goto("/u/" + res.key);
     }
 
     function clear() {

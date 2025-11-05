@@ -11,6 +11,6 @@
 
 {@render children?.()}
 
-<footer class="text-ctp-subtext0 text-xs font-pixel text-center">
-    bitzone is open source
+<footer class="text-ctp-subtext0 text-xs font-pixel text-center mt-4">
+    shut up
 </footer>

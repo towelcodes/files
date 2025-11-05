@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Eye, Download, TriangleAlert } from "@lucide/svelte";
+    import { Eye, Download, TriangleAlert, Plus } from "@lucide/svelte";
     import type { PageProps } from "./$types";
     let { data, form }: PageProps = $props();
     console.log(data);
@@ -21,6 +21,9 @@
                 download={data.file}
             >
                 <Download />
+            </a>
+            <a class="bg-ctp-maroon px-2 hover:cursor-pointer" href="/">
+                <Plus />
             </a>
         </div>
         <div class="p-2 text-left font-bold font-mono flex *:my-auto gap-2">
