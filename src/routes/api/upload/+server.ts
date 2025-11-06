@@ -1,7 +1,7 @@
 import type { RequestHandler } from "./$types";
 import { put } from "$lib/server/s3";
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, getClientAddress }) => {
   const form = await request.formData();
   const file = form.get("file") as File | null;
   if (!file || !(file instanceof File))
@@ -12,7 +12,15 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const key = await put(file.stream(), file.type);
 
-  console.log("upload", request, key, file.size, file.type);
+  console.log({
+    action: "upload",
+    key,
+    filename: file.name,
+    size: file.size,
+    type: file.type,
+    ip: getClientAddress(),
+    request,
+  });
 
   return new Response(
     JSON.stringify({
