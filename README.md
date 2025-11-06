@@ -2,5 +2,4 @@
 
 public instance: [files.towel.codes](https://files.towel.codes)
 
-## Build Vars
--
+check the .env.example for required variables and example values
