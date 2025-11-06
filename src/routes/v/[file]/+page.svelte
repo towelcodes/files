@@ -1,10 +1,32 @@
 <script lang="ts">
+    import { env } from "$env/dynamic/public";
     import { Eye, Download, TriangleAlert, Plus } from "@lucide/svelte";
     import type { PageProps } from "./$types";
     let { data, form }: PageProps = $props();
-    console.log(data);
-    console.log(form);
 </script>
+
+<svelte:head>
+    <meta property="og:title" content={data.file} />
+    <meta property="og:type" content="video.other" />
+    <meta property="og:url" content={`${env.PUBLIC_BASE_URL}/u/${data.file}`} />
+    {#if data.contentType.startsWith("image")}
+        <meta
+            property="og:image"
+            content={`${env.PUBLIC_BASE_URL}/u/${data.file}`}
+        />
+    {:else}
+        <meta
+            property="og:image"
+            content={`${env.PUBLIC_BASE_URL}/default.png`}
+        />
+    {/if}
+    {#if data.contentType.startsWith("video")}
+        <meta
+            property="og:video"
+            content={`${env.PUBLIC_BASE_URL}/u/${data.file}`}
+        />
+    {/if}
+</svelte:head>
 
 <div class="flex text-center justify-center items-center mt-4">
     <div class="w-max md:w-4/5 lg:w-2/3 p-4 border-2 border-ctp-mauve">
