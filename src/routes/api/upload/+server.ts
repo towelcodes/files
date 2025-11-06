@@ -12,6 +12,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const key = await put(file.stream(), file.type);
 
+  console.log("upload", request, key, file.size, file.type);
+
   return new Response(
     JSON.stringify({
       key,
