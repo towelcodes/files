@@ -1,3 +1,6 @@
-# S3 File Upload / Download Frontend (wip)
+# S3 File Upload / Download Frontend
 
-public instance: [bz.towel.codes](https://bz.towel.codes)
+public instance: [files.towel.codes](https://files.towel.codes)
+
+## Build Vars
+-

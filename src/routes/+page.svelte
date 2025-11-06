@@ -1,4 +1,9 @@
 <script lang="ts">
+    import {
+        PUBLIC_INSTANCE_NAME,
+        PUBLIC_INSTANCE_TAGLINE,
+        PUBLIC_INSTANCE_RULES,
+    } from "$env/static/public";
     import { goto } from "$app/navigation";
     import {
         TriangleAlert,
@@ -7,6 +12,8 @@
         X,
         LoaderCircle,
     } from "@lucide/svelte";
+
+    const rules = PUBLIC_INSTANCE_RULES.split("\\n");
 
     let uploadButton,
         clearButton: HTMLButtonElement | undefined = $state();
@@ -103,36 +110,37 @@
         <h1
             class="bg-ctp-red text-ctp-crust italic font-bold rounded px-2 py-0.5 w-min text-lg"
         >
-            bitzone
+            {PUBLIC_INSTANCE_NAME ?? "bitzone"}
         </h1>
 
-        <span class="text-ctp-subtext0 italic"> free file uploads </span>
+        <span class="text-ctp-subtext0 italic">
+            {PUBLIC_INSTANCE_TAGLINE}
+        </span>
     </nav>
 
-    <div class="my-4">
-        <div class="border-2 rounded border-ctp-red relative p-4">
-            <div
-                class="absolute bg-bg italic text-ctp-red -top-2.5 text-sm px-1 flex gap-1 *:my-auto"
-            >
-                <TriangleAlert class="h-4" />
-                <div>instance rules</div>
-            </div>
+    {#if rules.length > 0}
+        <div class="my-4">
+            <div class="border-2 rounded border-ctp-red relative p-4">
+                <div
+                    class="absolute bg-bg italic text-ctp-red -top-2.5 text-sm px-1 flex gap-1 *:my-auto"
+                >
+                    <TriangleAlert class="h-4" />
+                    <div>instance rules</div>
+                </div>
 
-            <ul class="text-sm">
-                <li>do not upload nsfw or illegal content.</li>
-                <li>this service is for personal use only.</li>
-                <li>
-                    accept that your content may disappear at any time for any
-                    reason.
-                </li>
-            </ul>
+                <ul class="text-sm">
+                    {#each rules as line}
+                        <li>{line}</li>
+                    {/each}
+                </ul>
+            </div>
+            <span class="text-xs text-ctp-subtext0 italic">
+                don't like these rules? <a href="https://github.com"
+                    >host your own!</a
+                >
+            </span>
         </div>
-        <span class="text-xs text-ctp-subtext0 italic">
-            don't like these rules? <a href="https://github.com"
-                >host your own!</a
-            >
-        </span>
-    </div>
+    {/if}
 
     <div class="text-center *:mx-auto">
         <label
