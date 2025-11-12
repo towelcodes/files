@@ -3,20 +3,20 @@ import { get } from "$lib/server/s3";
 import { isBrowser } from "$lib/util";
 import type { RequestHandler } from "./$types";
 
-export const GET: RequestHandler = async ({ request, params }) => {
+export const GET: RequestHandler = async ({ request, params, platform }) => {
   if (isBrowser(request.headers)) {
     redirect(303, `/v/${params.file}/`);
   }
 
   try {
-    const res = await get(params.file);
+    const object = await get(platform!!, params.file);
 
-    if (!res.Body) return new Response(null, { status: 404 });
+    if (object == undefined) return new Response(null, { status: 404 });
 
-    return new Response(res.Body as any, {
+    return new Response(object.body as any, {
       headers: {
-        "Content-Type": res.ContentType ?? "application/octet-stream",
-        "Content-Length": res.ContentLength?.toString() ?? "",
+        "Content-Type":
+          object.httpMetadata?.contentType ?? "application/octet-stream",
       },
     });
   } catch (err: any) {

@@ -10,6 +10,7 @@ import {
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
 } from "$env/static/private";
+import type { R2Bucket } from "@cloudflare/workers-types";
 
 export const client = new S3Client({
   endpoint: S3_ENDPOINT,
@@ -20,46 +21,32 @@ export const client = new S3Client({
   },
 });
 
+// TODO use multipart uploads for large files
 export async function put(
-  data: Buffer | ReadableStream,
-  type: string,
-  name?: string,
+  platform: App.Platform,
+  data: ArrayBuffer,
+  contentType: string,
+  options?: {
+    name?: string;
+    metadata?: Record<string, string>;
+  },
 ) {
-  const key = name ?? (await createUniqueId());
-  const upload = new Upload({
-    client,
-    params: {
-      Bucket: S3_BUCKET,
-      Key: key,
-      Body: data,
-      ContentType: type,
+  const key = options?.name ?? (await createUniqueId(platform));
+  await platform.env.bucket.put(key, data, {
+    customMetadata: options?.metadata,
+    httpMetadata: {
+      contentType,
     },
   });
-  await upload.done();
   return key;
 }
 
-export async function get(key: string) {
-  return await client.send(
-    new GetObjectCommand({
-      Bucket: S3_BUCKET,
-      Key: key,
-    }),
-  );
+export async function get(platform: App.Platform, key: string) {
+  return await platform.env.bucket.get(key);
 }
 
-export async function check(key: string) {
-  try {
-    return await client.send(
-      new HeadObjectCommand({
-        Bucket: S3_BUCKET,
-        Key: key,
-      }),
-    );
-  } catch (err: any) {
-    if (err?.$metadata?.httpStatusCode === 404) return false;
-    throw err;
-  }
+export async function check(platform: App.Platform, key: string) {
+  return await platform.env.bucket.head(key);
 }
 
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -71,19 +58,11 @@ export function createId(len = 5) {
   return out;
 }
 
-export async function createUniqueId() {
+export async function createUniqueId(platform: App.Platform) {
   for (;;) {
     const id = createId(5);
-    try {
-      await client.send(
-        new HeadObjectCommand({
-          Bucket: S3_BUCKET,
-          Key: id,
-        }),
-      );
-    } catch (err: any) {
-      if (err?.$metadata?.httpStatusCode === 404) return id;
-      throw err;
+    if ((await platform.env.bucket.head(id)) == null) {
+      return id;
     }
   }
 }

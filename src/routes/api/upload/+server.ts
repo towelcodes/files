@@ -14,7 +14,7 @@ export const PUT: RequestHandler = async ({
       headers: { "Content-Type": "application/json" },
     });
 
-  const key = await put(file.stream(), file.type);
+  const key = await put(platform!!, await file.arrayBuffer(), file.type);
 
   console.log({
     action: "upload",
