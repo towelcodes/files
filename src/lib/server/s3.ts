@@ -1,25 +1,4 @@
-import {
-  GetObjectCommand,
-  S3Client,
-  HeadObjectCommand,
-} from "@aws-sdk/client-s3";
-import { Upload } from "@aws-sdk/lib-storage";
-import {
-  S3_ENDPOINT,
-  S3_BUCKET,
-  S3_ACCESS_KEY_ID,
-  S3_SECRET_ACCESS_KEY,
-} from "$env/static/private";
 import type { R2Bucket } from "@cloudflare/workers-types";
-
-export const client = new S3Client({
-  endpoint: S3_ENDPOINT,
-  region: "auto",
-  credentials: {
-    accessKeyId: S3_ACCESS_KEY_ID,
-    secretAccessKey: S3_SECRET_ACCESS_KEY,
-  },
-});
 
 // TODO use multipart uploads for large files
 export async function put(
