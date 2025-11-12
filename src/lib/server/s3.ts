@@ -1,5 +1,4 @@
 import {
-  PutObjectCommand,
   GetObjectCommand,
   S3Client,
   HeadObjectCommand,

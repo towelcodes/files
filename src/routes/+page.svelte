@@ -31,7 +31,7 @@
         console.log(fd);
 
         const req = new XMLHttpRequest();
-        req.open("POST", "/api/upload");
+        req.open("PUT", "/api/upload");
         req.responseType = "json";
 
         const res = await new Promise((resolve) => {

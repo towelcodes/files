@@ -1,7 +1,11 @@
 import type { RequestHandler } from "./$types";
 import { put } from "$lib/server/s3";
 
-export const POST: RequestHandler = async ({ request, getClientAddress }) => {
+export const PUT: RequestHandler = async ({
+  request,
+  getClientAddress,
+  platform,
+}) => {
   const form = await request.formData();
   const file = form.get("file") as File | null;
   if (!file || !(file instanceof File))

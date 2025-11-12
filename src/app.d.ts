@@ -1,3 +1,4 @@
+import { R2Bucket, Fetcher } from "@cloudflare/workers-types";
 declare global {
   namespace App {
     interface Platform {
