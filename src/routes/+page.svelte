@@ -12,6 +12,7 @@
         X,
         LoaderCircle,
     } from "@lucide/svelte";
+    import Modal from "$lib/Modal.svelte";
 
     const rules = PUBLIC_INSTANCE_RULES.split("\\n");
 
@@ -21,6 +22,8 @@
     let filename = $state("");
     let files: FileList | undefined = $state();
     let progress: number | undefined = $state();
+
+    let error: { title: string; description: string } | undefined = $state();
 
     async function upload() {
         if (!files) return;
@@ -61,7 +64,16 @@
         console.log("completed: ", req.readyState, req.status);
         // FIXME typescript errors
         progress = undefined;
-        goto("/u/" + res.key);
+
+        if (req.status == 201) {
+            goto("/u/" + res.key);
+        } else {
+            error = {
+                title: res.status,
+                description:
+                    res.status == 213 ? "content too large" : "something else",
+            };
+        }
     }
 
     function clear() {
@@ -105,7 +117,15 @@
     }
 </script>
 
-<div class="font-mono p-8">
+{#if error}
+    <Modal
+        title={error.title}
+        description={error.description}
+        click={() => (error = undefined)}
+    />
+{/if}
+
+<div class="font-mono p-8 container lg:max-w-2xl! mx-auto">
     <nav class="flex *:my-auto gap-4 m-4 mb-8">
         <h1
             class="bg-ctp-red text-ctp-crust italic font-bold rounded px-2 py-0.5 w-min text-lg"

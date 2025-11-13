@@ -1,5 +1,3 @@
-import type { R2Bucket } from "@cloudflare/workers-types";
-
 // TODO use multipart uploads for large files
 export async function put(
   platform: App.Platform,
