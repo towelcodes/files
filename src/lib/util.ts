@@ -6,3 +6,36 @@ export function isBrowser(headers: Headers): boolean {
   }
   return false;
 }
+
+const byteToHex: string[] = [];
+
+for (let n = 0; n <= 0xff; ++n) {
+  const hexOctet = n.toString(16).padStart(2, "0");
+  byteToHex.push(hexOctet);
+}
+
+// thank you https://stackoverflow.com/questions/40031688/how-can-i-convert-an-arraybuffer-to-a-hexadecimal-string-hex
+export function hex(arrayBuffer: ArrayBuffer) {
+  const buff = new Uint8Array(arrayBuffer);
+  const hexOctets = []; // new Array(buff.length) is even faster (preallocates necessary array size), then use hexOctets[i] instead of .push()
+
+  for (let i = 0; i < buff.length; ++i) hexOctets.push(byteToHex[buff[i]]);
+
+  return hexOctets.join("");
+}
+
+export async function hmacSign(keyStr: string, msg: string) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(keyStr),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(msg));
+  return [...new Uint8Array(sig)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}

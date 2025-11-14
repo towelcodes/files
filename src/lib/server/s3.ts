@@ -43,3 +43,16 @@ export async function createUniqueId(platform: App.Platform) {
     }
   }
 }
+
+export function getAmzDate() {
+  const now = new Date();
+  const yyyy = now.getUTCFullYear();
+  const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(now.getUTCDate()).padStart(2, "0");
+  const hh = String(now.getUTCHours()).padStart(2, "0");
+  const mi = String(now.getUTCMinutes()).padStart(2, "0");
+  const ss = String(now.getUTCSeconds()).padStart(2, "0");
+  const amzDate = `${yyyy}${mm}${dd}T${hh}${mi}${ss}Z`;
+  const dateStamp = `${yyyy}${mm}${dd}`;
+  return { amzDate, dateStamp };
+}
