@@ -1,3 +1,16 @@
+import {
+  S3_ENDPOINT,
+  S3_ACCESS_KEY_ID,
+  S3_SECRET_ACCESS_KEY,
+  S3_BUCKET,
+} from "$env/static/private";
+import { AwsClient } from "aws4fetch";
+
+export const client = new AwsClient({
+  accessKeyId: S3_ACCESS_KEY_ID,
+  secretAccessKey: S3_SECRET_ACCESS_KEY,
+});
+
 // TODO use multipart uploads for large files
 export async function put(
   platform: App.Platform,

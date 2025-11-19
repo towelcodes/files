@@ -5,8 +5,8 @@ import {
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
 } from "$env/static/private";
-import { createUniqueId, getAmzDate } from "$lib/server/s3";
-import { hex, hmacSign } from "$lib/util";
+import { client, createUniqueId, getAmzDate } from "$lib/server/s3";
+import { XMLParser } from "fast-xml-parser";
 
 export const POST: RequestHandler = async ({
   request,
@@ -14,71 +14,64 @@ export const POST: RequestHandler = async ({
   fetch,
   platform,
 }) => {
-  let key = await createUniqueId(platform!!);
-  const { amzDate, dateStamp } = getAmzDate();
-  const enc = new TextEncoder();
+  let { key = await createUniqueId(platform!!), parts = 1 } =
+    await request.json();
 
-  const method = "POST";
-  const scope = `${dateStamp}/auto/s3/aws4_request`;
-  const uri = `/${S3_BUCKET}/${key}`;
-  const host = `${S3_ENDPOINT.substring(8)}`;
-  const url = `${S3_ENDPOINT}${uri}`;
-
-  const canonicalQuery = "uploads=";
-  const canonicalHeaders =
-    `host:${host}\n` +
-    `x-amz-content-sha256:UNSIGNED-PAYLOAD\n` +
-    `x-amz-date:${amzDate}\n`;
-  const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
-
-  const canonicalRequest =
-    `${method}\n` +
-    `${uri}\n` +
-    `${canonicalQuery}\n` +
-    `${canonicalHeaders}\n` +
-    `${signedHeaders}\n` +
-    "UNSIGNED-PAYLOAD";
-  // `${hex(await crypto.subtle.digest("SHA-256", enc.encode("")))}`;
-  console.log("REQUEST === \n" + canonicalRequest);
-
-  const toSign =
-    "AWS4-HMAC-SHA256\n" +
-    `${amzDate}\n` +
-    `${scope}\n` +
-    hex(await crypto.subtle.digest("SHA-256", enc.encode(canonicalRequest)));
-  console.log("TO SIGN === \n" + toSign);
-  const signingKey = await hmacSign(
-    await hmacSign(
-      await hmacSign(
-        await hmacSign("AWS4" + S3_SECRET_ACCESS_KEY, dateStamp),
-        "auto",
-      ),
-      "s3",
-    ),
-    "aws4_request",
-  );
-  console.log("SIGNING KEY === \n" + signingKey);
-  const signature = await hmacSign(signingKey, toSign);
-  console.log("SIGNATURE === \n" + signature);
-
-  const credential = `${S3_ACCESS_KEY_ID}/${dateStamp}/auto/s3/aws4_request`;
-  const res = await fetch(`${url}?${canonicalQuery}`, {
-    headers: {
-      Authorization: `AWS4-HMAC-SHA256 Credential=${credential},SignedHeaders=${signedHeaders},Signature=${signature}`,
-      "x-amz-date": amzDate,
-      "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+  // create the multipart upload
+  const uploadRes = await client.fetch(
+    `https://${S3_BUCKET}.${S3_ENDPOINT}/${key}?uploads`,
+    {
+      method: "POST",
     },
-  });
+  );
+  console.log(uploadRes);
 
-  console.log(res);
-  console.log(await res.text());
+  if (uploadRes.status != 200) {
+    console.error(await uploadRes.text());
+    return new Response(null, {
+      status: uploadRes.status,
+    });
+  }
+
+  // parse response
+  const parser = new XMLParser();
+  const upload = parser.parse(await uploadRes.text());
+
+  if (upload["InitiateMultipartUploadResult"]["UploadId"] == undefined) {
+    console.error(upload);
+    return new Response(null, {
+      status: uploadRes.status || 500,
+    });
+  }
+
+  const uploadId = upload["UploadId"];
+
+  let preSignedParts = [];
+
+  console.log("parts", parts);
+  for (let i = 0; i < parts; i++) {
+    const url = new URL(
+      `https://${S3_BUCKET}.${S3_ENDPOINT}/${key}?partNumber=${i}&uploadId=${uploadId}`,
+    );
+    const signed = await client.sign(
+      new Request(url, {
+        method: "PUT",
+      }),
+      {
+        aws: { signQuery: true },
+      },
+    );
+    console.log("signed part", signed);
+    preSignedParts.push(signed.url);
+  }
 
   return new Response(
     JSON.stringify({
       key,
+      preSignedParts,
     }),
     {
-      status: res.status,
+      status: 200,
       headers: {
         ContentType: "application/json",
       },
