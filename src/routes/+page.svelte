@@ -27,10 +27,12 @@
 
     async function upload() {
         if (!files) return;
-        console.log(files);
+        if (files[0] == undefined) return;
+        const file: File = files[0];
+        console.log(file);
 
         const fd = new FormData();
-        fd.append("file", files[0]);
+        fd.append("file", file);
         console.log(fd);
 
         const req = new XMLHttpRequest();
