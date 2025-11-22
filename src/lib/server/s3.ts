@@ -29,7 +29,11 @@ export async function put(
     body: data,
   });
   if (res.status != 200) {
-    console.error(`Non 200 status while putting ${k}:`, res);
+    console.error(`Non 200 status while putting ${k}:`, {
+      status: res.status,
+      statusText: res.statusText,
+      text: await res.text(),
+    });
   }
   return res;
 }
@@ -45,7 +49,11 @@ export async function get(key: string) {
   if (res.status == 200) {
     return res;
   } else {
-    console.error(`Unexpected response while getting ${key}:`, res);
+    console.error(`Unexpected response while getting ${key}:`, {
+      statusText: res.statusText,
+      status: res.status,
+      text: await res.text(),
+    });
     return undefined;
   }
 }
@@ -61,7 +69,11 @@ export async function check(key: string) {
   if (res.status == 200) {
     return res;
   } else {
-    console.error(`Unexpected response while checking ${key}:`, res);
+    console.error(`Unexpected response while checking ${key}:`, {
+      statusText: res.statusText,
+      status: res.status,
+      text: await res.text(),
+    });
     return undefined;
   }
 }
