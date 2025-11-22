@@ -13,6 +13,7 @@
         LoaderCircle,
     } from "@lucide/svelte";
     import Modal from "$lib/Modal.svelte";
+    import { createUpload } from "$lib/util";
 
     const rules = PUBLIC_INSTANCE_RULES.split("\\n");
 
@@ -27,55 +28,64 @@
 
     async function upload() {
         if (!files) return;
-        if (files[0] == undefined) return;
-        const file: File = files[0];
-        console.log(file);
+        if (files.item(0) == null) return;
+        const file = files.item(0)!!;
 
         const fd = new FormData();
         fd.append("file", file);
         console.log(fd);
 
-        const req = new XMLHttpRequest();
-        req.open("PUT", "/api/upload");
-        req.responseType = "json";
+        // create the upload
+        try {
+            const { key, signed } = await createUpload();
+            const req = new XMLHttpRequest();
+            req.open("PUT", signed);
+            const res = await new Promise((resolve) => {
+                req.upload.addEventListener("progress", (e) => {
+                    if (e.lengthComputable) {
+                        progress = e.loaded / e.total;
+                        console.log(
+                            "upload: ",
+                            e.loaded,
+                            e.total,
+                            e.loaded / e.total,
+                        );
+                    }
+                });
+                req.upload.addEventListener("loadend", () => {
+                    console.log("loadend");
+                });
+                req.addEventListener("readystatechange", () => {
+                    console.log("readyState", req.readyState);
+                    if (req.readyState == 4) {
+                        resolve(req.response);
+                    }
+                });
+                req.send(fd);
+            });
+            console.log("completed: ", req.readyState, req.status);
+            goto(`/v/${key}`);
+        } catch (e) {
+            console.error(e);
+            error = {
+                title: "something went wrong",
+                description: "check the console",
+            };
+            return;
+        }
 
-        const res = await new Promise((resolve) => {
-            req.upload.addEventListener("progress", (e) => {
-                if (e.lengthComputable) {
-                    progress = e.loaded / e.total;
-                    console.log(
-                        "upload: ",
-                        e.loaded,
-                        e.total,
-                        e.loaded / e.total,
-                    );
-                }
-            });
-            req.upload.addEventListener("loadend", () => {
-                console.log("loadend");
-            });
-            req.addEventListener("readystatechange", () => {
-                console.log("readyState", req.readyState);
-                if (req.readyState == 4) {
-                    resolve(req.response);
-                }
-            });
-            req.send(fd);
-        });
-
-        console.log("completed: ", req.readyState, req.status);
         // FIXME typescript errors
         progress = undefined;
 
-        if (req.status == 201) {
-            goto("/u/" + res.key);
-        } else {
-            error = {
-                title: res.status,
-                description:
-                    res.status == 213 ? "content too large" : "something else",
-            };
-        }
+        // if (req.status == 201) {
+        //     goto("/u/" + res.key);
+        // } else {
+        //     error = {
+        //         title: res.status,
+        //         description:
+        //             res.status == 213 ? "content too large" : "something else",
+        //     };
+        // }
     }
 
     function clear() {

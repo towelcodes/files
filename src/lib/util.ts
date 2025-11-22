@@ -39,3 +39,22 @@ export async function hmacSign(keyStr: string, msg: string) {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
+
+export async function createUpload(key: string | undefined = undefined) {
+  const body = key == undefined ? null : { key };
+  const res = await fetch("/api/upload/create", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+  if (res.status != 200) {
+    console.error(res);
+    throw new Error(`${res.status} ${res.statusText}`);
+  }
+
+  const json = await res.json();
+  return {
+    key: json.key,
+    signed: json.signed,
+  };
+}
