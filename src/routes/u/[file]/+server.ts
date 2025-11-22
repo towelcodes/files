@@ -10,14 +10,14 @@ export const GET: RequestHandler = async ({ request, params, platform }) => {
 
   try {
     console.log(platform);
-    const object = await get(platform!!, params.file);
+    const object = await get(params.file);
 
     if (object == undefined) return new Response(null, { status: 404 });
 
     return new Response(object.body as any, {
       headers: {
         "Content-Type":
-          object.httpMetadata?.contentType ?? "application/octet-stream",
+          object.headers.get("Content-Type") ?? "application/octet-stream",
       },
     });
   } catch (err: any) {

@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ params, request, platform }) => {
   }
 
   // fetch the file
-  const object = await check(platform!!, `${params.file}`);
+  const object = await check(`${params.file}`);
 
   if (object == null) {
     return error(404, "Not found");
@@ -17,7 +17,8 @@ export const load: PageServerLoad = async ({ params, request, platform }) => {
 
   return {
     file: params.file,
-    lastModified: object.uploaded,
-    contentType: object.httpMetadata?.contentType ?? "application/octet-stream",
+    lastModified: object.headers.get("Last-Modified"),
+    contentType:
+      object.headers.get("Content-Type") ?? "application/octet-stream",
   };
 };

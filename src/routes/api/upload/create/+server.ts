@@ -16,9 +16,9 @@ export const POST: RequestHandler = async ({
   let key = "";
   try {
     const json = await request.json();
-    key = json.key ?? (await createUniqueId(platform!!));
+    key = json.key ?? (await createUniqueId());
   } catch {
-    key = await createUniqueId(platform!!);
+    key = await createUniqueId();
   }
 
   const url = new URL(`https://${S3_BUCKET}.${S3_ENDPOINT}/${key}`);

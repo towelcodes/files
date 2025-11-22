@@ -11,38 +11,59 @@ export const client = new AwsClient({
   secretAccessKey: S3_SECRET_ACCESS_KEY,
 });
 
-// TODO use multipart uploads for large files
 export async function put(
-  platform: App.Platform,
   data: ArrayBuffer,
   contentType: string,
   options?: {
-    name?: string;
+    key?: string;
     metadata?: Record<string, string>;
   },
 ) {
-  const key = options?.name ?? (await createUniqueId(platform));
-  await platform.env.bucket.put(key, data, {
-    customMetadata: options?.metadata,
-    httpMetadata: {
-      contentType,
+  const k = options?.key ?? (await createUniqueId());
+  const url = new URL(`https://${S3_BUCKET}.${S3_ENDPOINT}/${k}`);
+  const res = await client.fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": contentType,
     },
+    body: data,
   });
-  return key;
+  if (res.status != 200) {
+    console.error(`Non 200 status while putting ${k}:`, res);
+  }
+  return res;
 }
 
-export async function get(platform: App.Platform, key: string) {
-  console.log("getting:", key);
-  console.log(platform.env.bucket.get);
-  console.log(await platform.env.bucket.get(key));
-  return await platform.env.bucket.get(key);
+export async function get(key: string) {
+  const url = new URL(`https://${S3_BUCKET}.${S3_ENDPOINT}/${key}`);
+  const res = await client.fetch(url, {
+    method: "GET",
+  });
+  if (res.status == 404) {
+    return undefined;
+  }
+  if (res.status == 200) {
+    return res;
+  } else {
+    console.error(`Unexpected response while getting ${key}:`, res);
+    return undefined;
+  }
 }
 
-export async function check(platform: App.Platform, key: string) {
-  console.log("checking: ", key);
-  console.log(platform.env.bucket.head);
-  console.log(await platform.env.bucket.head(key));
-  return await platform.env.bucket.head(key);
+export async function check(key: string) {
+  const url = new URL(`https://${S3_BUCKET}.${S3_ENDPOINT}/${key}`);
+  const res = await client.fetch(url, {
+    method: "HEAD",
+  });
+  if (res.status == 404) {
+    return undefined;
+  }
+  if (res.status == 200) {
+    return res;
+  } else {
+    console.error(`Unexpected response while checking ${key}:`, res);
+    return undefined;
+  }
 }
 
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -54,10 +75,10 @@ export function createId(len = 5) {
   return out;
 }
 
-export async function createUniqueId(platform: App.Platform) {
+export async function createUniqueId() {
   for (;;) {
     const id = createId(5);
-    if ((await platform.env.bucket.head(id)) == null) {
+    if ((await check(id)) == null) {
       return id;
     }
   }
