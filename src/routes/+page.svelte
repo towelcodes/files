@@ -31,15 +31,12 @@
         if (files.item(0) == null) return;
         const file = files.item(0)!!;
 
-        const fd = new FormData();
-        fd.append("file", file);
-        console.log(fd);
-
         // create the upload
         try {
             const { key, signed } = await createUpload();
             const req = new XMLHttpRequest();
             req.open("PUT", signed);
+            req.setRequestHeader("Content-Type", file.type);
             const res = await new Promise((resolve) => {
                 req.upload.addEventListener("progress", (e) => {
                     if (e.lengthComputable) {
@@ -61,7 +58,7 @@
                         resolve(req.response);
                     }
                 });
-                req.send(fd);
+                req.send(file);
             });
             console.log("completed: ", req.readyState, req.status);
             goto(`/v/${key}`);

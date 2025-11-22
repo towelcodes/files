@@ -32,10 +32,16 @@ export async function put(
 }
 
 export async function get(platform: App.Platform, key: string) {
+  console.log("getting:", key);
+  console.log(platform.env.bucket.get);
+  console.log(await platform.env.bucket.get(key));
   return await platform.env.bucket.get(key);
 }
 
 export async function check(platform: App.Platform, key: string) {
+  console.log("checking: ", key);
+  console.log(platform.env.bucket.head);
+  console.log(await platform.env.bucket.head(key));
   return await platform.env.bucket.head(key);
 }
 

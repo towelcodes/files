@@ -9,6 +9,7 @@ export const GET: RequestHandler = async ({ request, params, platform }) => {
   }
 
   try {
+    console.log(platform);
     const object = await get(platform!!, params.file);
 
     if (object == undefined) return new Response(null, { status: 404 });
