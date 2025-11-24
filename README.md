@@ -1,4 +1,4 @@
-# S3 File Upload / Download Frontend
+# S3-compatible file sharing frontend
 
 public instance: [files.towel.codes](https://files.towel.codes)
 

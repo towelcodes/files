@@ -40,8 +40,11 @@ export async function hmacSign(keyStr: string, msg: string) {
     .join("");
 }
 
-export async function createUpload(key: string | undefined = undefined) {
-  const body = key == undefined ? null : { key };
+export async function createUpload(size: number, key?: string) {
+  const body = {
+    size,
+    key,
+  };
   const res = await fetch("/api/upload/create", {
     method: "POST",
     body: JSON.stringify(body),

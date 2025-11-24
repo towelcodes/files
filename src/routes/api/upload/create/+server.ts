@@ -5,32 +5,43 @@ import {
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
 } from "$env/static/private";
+import { env } from "$env/dynamic/public";
 import { client, createUniqueId } from "$lib/server/s3";
+import { error } from "@sveltejs/kit";
 
-export const POST: RequestHandler = async ({
-  request,
-  getClientAddress,
-  fetch,
-  platform,
-}) => {
+export const POST: RequestHandler = async ({ request, getClientAddress }) => {
   let key = "";
+  let size = 0;
   try {
     const json = await request.json();
     key = json.key ?? (await createUniqueId());
+
+    if (json.size == undefined) {
+      error(400);
+    } else if (env.PUBLIC_MAX_SIZE != undefined) {
+      if (json.size > parseInt(env.PUBLIC_MAX_SIZE)) {
+        error(413);
+      }
+    }
+    size = json.size;
   } catch {
-    key = await createUniqueId();
+    error(400);
   }
 
   const url = new URL(`https://${S3_BUCKET}.${S3_ENDPOINT}/${key}`);
   const signed = await client.sign(
     new Request(url, {
       method: "PUT",
+      headers: {
+        "Content-Length": `${size}`,
+      },
     }),
     {
       aws: { signQuery: true },
     },
   );
-  console.log(signed);
+
+  console.log("Created upload", { ip: getClientAddress() });
 
   return new Response(
     JSON.stringify({

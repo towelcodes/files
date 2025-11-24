@@ -3,7 +3,9 @@
         PUBLIC_INSTANCE_NAME,
         PUBLIC_INSTANCE_TAGLINE,
         PUBLIC_INSTANCE_RULES,
+        PUBLIC_REPO_URL,
     } from "$env/static/public";
+    import { env } from "$env/dynamic/public";
     import { goto } from "$app/navigation";
     import {
         TriangleAlert,
@@ -33,7 +35,7 @@
 
         // create the upload
         try {
-            const { key, signed } = await createUpload();
+            const { key, signed } = await createUpload(file.size);
             const req = new XMLHttpRequest();
             req.open("PUT", signed);
             req.setRequestHeader("Content-Type", file.type);
@@ -71,18 +73,7 @@
             return;
         }
 
-        // FIXME typescript errors
         progress = undefined;
-
-        // if (req.status == 201) {
-        //     goto("/u/" + res.key);
-        // } else {
-        //     error = {
-        //         title: res.status,
-        //         description:
-        //             res.status == 213 ? "content too large" : "something else",
-        //     };
-        // }
     }
 
     function clear() {
@@ -94,8 +85,19 @@
             console.log(files);
             if (files.length > 0) {
                 filename = files[0].name;
-                uploadButton!!.disabled = false;
-                clearButton!!.disabled = false;
+
+                if (env.PUBLIC_MAX_SIZE != undefined) {
+                    if (files[0].size > parseInt(env.PUBLIC_MAX_SIZE)) {
+                        uploadButton!!.disabled = true;
+                        clearButton!!.disabled = false;
+                    } else {
+                        uploadButton!!.disabled = false;
+                        clearButton!!.disabled = false;
+                    }
+                } else {
+                    uploadButton!!.disabled = false;
+                    clearButton!!.disabled = false;
+                }
             } else {
                 filename = "";
                 uploadButton!!.disabled = true;
@@ -164,7 +166,7 @@
                 </ul>
             </div>
             <span class="text-xs text-ctp-subtext0 italic">
-                don't like these rules? <a href="https://github.com"
+                don't like these rules? <a href={PUBLIC_REPO_URL}
                     >host your own!</a
                 >
             </span>
@@ -200,6 +202,11 @@
             </div>
             <input id="upload" type="file" bind:files class="hidden" />
         </label>
+        {#if env.PUBLIC_MAX_SIZE}
+            <div class="text-xs text-ctp-subtext0 -mt-4 mb-4">
+                max: {env.PUBLIC_MAX_SIZE} bytes
+            </div>
+        {/if}
 
         <div class="flex gap-2 mx-auto justify-center items-center">
             <button
