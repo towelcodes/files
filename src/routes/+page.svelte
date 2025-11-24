@@ -90,6 +90,10 @@
                     if (files[0].size > parseInt(env.PUBLIC_MAX_SIZE)) {
                         uploadButton!!.disabled = true;
                         clearButton!!.disabled = false;
+                        error = {
+                            title: "cannot upload this file",
+                            description: `size is too big (max: ${env.PUBLIC_MAX_SIZE} bytes)`,
+                        };
                     } else {
                         uploadButton!!.disabled = false;
                         clearButton!!.disabled = false;
@@ -132,7 +136,7 @@
     <Modal
         title={error.title}
         description={error.description}
-        click={() => (error = undefined)}
+        callback={() => (error = undefined)}
     />
 {/if}
 
