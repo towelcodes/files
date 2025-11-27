@@ -6,6 +6,7 @@ import {
   S3_SECRET_ACCESS_KEY,
 } from "$env/static/private";
 import { env } from "$env/dynamic/public";
+import { env as privateEnv } from "$env/dynamic/private";
 import { client, createUniqueId } from "$lib/server/s3";
 import { error } from "@sveltejs/kit";
 
@@ -42,6 +43,32 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
   );
 
   console.log("Created upload", { ip: getClientAddress() });
+
+  // log to webhook if enabled
+  if (privateEnv.UPLOAD_WEBHOOK != undefined) {
+    fetch(privateEnv.UPLOAD_WEBHOOK, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        embeds: [
+          {
+            title: `upload created | ${key}`,
+            fields: [
+              {
+                name: "size",
+                value: size
+              }, {
+                name: "ip",
+                value: getClientAddress()
+              }
+            ]
+          },
+        ],
+      }),
+    });
+  }
 
   return new Response(
     JSON.stringify({
