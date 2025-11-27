@@ -1,10 +1,5 @@
 import type { RequestHandler } from "./$types";
-import {
-  S3_ENDPOINT,
-  S3_BUCKET,
-  S3_ACCESS_KEY_ID,
-  S3_SECRET_ACCESS_KEY,
-} from "$env/static/private";
+import { S3_ENDPOINT, S3_BUCKET } from "$env/static/private";
 import { env } from "$env/dynamic/public";
 import { env as privateEnv } from "$env/dynamic/private";
 import { client, createUniqueId } from "$lib/server/s3";
@@ -46,28 +41,33 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 
   // log to webhook if enabled
   if (privateEnv.UPLOAD_WEBHOOK != undefined) {
-    fetch(privateEnv.UPLOAD_WEBHOOK, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        embeds: [
-          {
-            title: `upload created | ${key}`,
-            fields: [
-              {
-                name: "size",
-                value: size
-              }, {
-                name: "ip",
-                value: getClientAddress()
-              }
-            ]
-          },
-        ],
-      }),
-    });
+    try {
+      await fetch(privateEnv.UPLOAD_WEBHOOK, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          embeds: [
+            {
+              title: `upload created | ${key}`,
+              fields: [
+                {
+                  name: "size",
+                  value: size,
+                },
+                {
+                  name: "ip",
+                  value: getClientAddress(),
+                },
+              ],
+            },
+          ],
+        }),
+      });
+    } catch (e) {
+      console.warn("sending webhook failed: ", e);
+    }
   }
 
   return new Response(

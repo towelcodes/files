@@ -15,7 +15,7 @@
         LoaderCircle,
     } from "@lucide/svelte";
     import Modal from "$lib/Modal.svelte";
-    import { createUpload } from "$lib/util";
+    import { createUpload, prettyNumber } from "$lib/util";
     import Progress from "$lib/Progress.svelte";
 
     const rules = PUBLIC_INSTANCE_RULES.split("\\n");
@@ -25,7 +25,7 @@
 
     let filename = $state("");
     let files: FileList | undefined = $state();
-    let progress: number | undefined = $state();
+    let progress: { loaded: number; total: number } | undefined = $state();
 
     let error: { title: string; description: string } | undefined = $state();
 
@@ -43,7 +43,10 @@
             const res = await new Promise((resolve) => {
                 req.upload.addEventListener("progress", (e) => {
                     if (e.lengthComputable) {
-                        progress = e.loaded / e.total;
+                        progress = {
+                            loaded: e.loaded,
+                            total: e.total,
+                        };
                         console.log(
                             "upload: ",
                             e.loaded,
@@ -82,7 +85,7 @@
     }
 
     $effect(() => {
-      // FIXME tidy this up
+        // FIXME tidy this up
         if (files) {
             console.log(files);
             if (files.length > 0) {
@@ -197,7 +200,11 @@
                         class="ml-auto stroke-ctp-text animate-spin"
                     />
                     <p class="text-sm mr-auto">
-                        {(progress * 100).toPrecision(3)}%
+                        {((progress.loaded / progress.total) * 100).toPrecision(
+                            3,
+                        )}% ({prettyNumber(progress.loaded)}B / {prettyNumber(
+                            progress.total,
+                        )}B)
                     </p>
                 {:else}
                     <File class="ml-auto stroke-ctp-text" />
@@ -207,14 +214,17 @@
                 {/if}
             </div>
             {#if progress}
-                <Progress {progress} total={1} classList="w-full" />
+                <Progress
+                    progress={progress.loaded / progress.total}
+                    classList="w-full"
+                />
             {/if}
             <input id="upload" type="file" bind:files class="hidden" />
         </label>
 
         {#if env.PUBLIC_MAX_SIZE}
             <div class="text-xs text-ctp-subtext0 -mt-4 mb-4">
-                max: {env.PUBLIC_MAX_SIZE} bytes
+                max: {prettyNumber(parseInt(env.PUBLIC_MAX_SIZE))}B
             </div>
         {/if}
 

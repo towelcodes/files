@@ -61,3 +61,19 @@ export async function createUpload(size: number, key?: string) {
     signed: json.signed,
   };
 }
+
+export function prettyNumber(n: number, precision: number = 2) {
+  const trunc = Math.trunc(n);
+  const len = (Math.log(trunc) * Math.LOG10E + 1) | 0;
+  if (len < 4) {
+    return n.toString();
+  } else if (len >= 4 && len < 7) {
+    return `${(n / 10 ** 3).toFixed(precision)}K`;
+  } else if (len >= 7 && len < 10) {
+    return `${(n / 10 ** 6).toFixed(precision)}M`;
+  } else if (len >= 10 && len < 13) {
+    return `${(n / 10 ** 9).toFixed(precision)}G`;
+  } else {
+    return `${(n / 10 ** 12).toFixed(precision)}T`;
+  }
+}
