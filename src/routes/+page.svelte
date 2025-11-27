@@ -16,6 +16,7 @@
     } from "@lucide/svelte";
     import Modal from "$lib/Modal.svelte";
     import { createUpload } from "$lib/util";
+    import Progress from "$lib/Progress.svelte";
 
     const rules = PUBLIC_INSTANCE_RULES.split("\\n");
 
@@ -81,6 +82,7 @@
     }
 
     $effect(() => {
+      // FIXME tidy this up
         if (files) {
             console.log(files);
             if (files.length > 0) {
@@ -180,7 +182,7 @@
     <div class="text-center *:mx-auto">
         <label
             for="upload"
-            class="w-64 h-16 border-2 border-dotted border-ctp-lavender my-4 flex justify-center items-center"
+            class="w-64 h-16 px-4 border-2 border-dotted border-ctp-lavender my-4 flex justify-center items-center flex-col gap-3"
             ondrop={drop}
             ondragover={dragOver}
         >
@@ -204,8 +206,12 @@
                     </p>
                 {/if}
             </div>
+            {#if progress}
+                <Progress {progress} total={1} classList="w-full" />
+            {/if}
             <input id="upload" type="file" bind:files class="hidden" />
         </label>
+
         {#if env.PUBLIC_MAX_SIZE}
             <div class="text-xs text-ctp-subtext0 -mt-4 mb-4">
                 max: {env.PUBLIC_MAX_SIZE} bytes
