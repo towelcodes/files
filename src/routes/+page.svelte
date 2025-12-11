@@ -14,9 +14,9 @@
         X,
         LoaderCircle,
     } from "@lucide/svelte";
-    import Modal from "$lib/Modal.svelte";
     import { createUpload, prettyNumber } from "$lib/util";
     import Progress from "$lib/Progress.svelte";
+    import Notification from "$lib/Notification.svelte";
 
     const rules = PUBLIC_INSTANCE_RULES.split("\\n");
 
@@ -40,7 +40,7 @@
             const req = new XMLHttpRequest();
             req.open("PUT", signed);
             req.setRequestHeader("Content-Type", file.type);
-            const res = await new Promise((resolve) => {
+            await new Promise((resolve) => {
                 req.upload.addEventListener("progress", (e) => {
                     if (e.lengthComputable) {
                         progress = {
@@ -68,11 +68,11 @@
             });
             console.log("completed: ", req.readyState, req.status);
             goto(`/v/${key}`);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             error = {
-                title: "something went wrong",
-                description: "check the console",
+                title: "upload failed",
+                description: `${e.message} (check console)`,
             };
             return;
         }
@@ -138,7 +138,7 @@
 </script>
 
 {#if error}
-    <Modal
+    <Notification
         title={error.title}
         description={error.description}
         callback={() => (error = undefined)}
@@ -228,6 +228,7 @@
             </div>
         {/if}
 
+        <!-- upload buttons -->
         <div class="flex gap-2 mx-auto justify-center items-center">
             <button
                 class="button border-ctp-red bg-ctp-red"
