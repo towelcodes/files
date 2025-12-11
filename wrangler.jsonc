@@ -21,4 +21,7 @@
       "persist": true,
     },
   },
+  "vars": {
+    "PUBLIC_MAX_SIZE": "1000000000000",
+  },
 }
