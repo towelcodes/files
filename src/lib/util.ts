@@ -48,6 +48,9 @@ export async function createUpload(size: number, key?: string) {
   const res = await fetch("/api/upload/create", {
     method: "POST",
     body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "applicaiton/json"
+    }
   });
 
   if (res.status != 200) {

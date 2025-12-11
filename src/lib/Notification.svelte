@@ -23,7 +23,7 @@
         },
     ];
 
-    function dismiss() {
+    export function dismiss() {
         root!!.animate(dismissAnimation, {
             duration: 300,
             iterations: 1,

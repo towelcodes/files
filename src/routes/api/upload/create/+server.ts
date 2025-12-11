@@ -13,15 +13,21 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
     key = json.key ?? (await createUniqueId());
 
     if (json.size == undefined) {
-      error(400);
+      error(400, {
+        message: "missing `size` property",
+      });
     } else if (env.PUBLIC_MAX_SIZE != undefined) {
       if (json.size > parseInt(env.PUBLIC_MAX_SIZE)) {
-        error(413);
+        error(413, {
+          message: "content is larger than this instance supports",
+        });
       }
     }
     size = json.size;
   } catch {
-    error(400);
+    error(400, {
+      message: "missing json body",
+    });
   }
 
   const url = new URL(`https://${S3_BUCKET}.${S3_ENDPOINT}/${key}`);
