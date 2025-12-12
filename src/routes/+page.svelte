@@ -16,6 +16,7 @@
     } from "@lucide/svelte";
     import { createUpload, prettyNumber } from "$lib/util";
     import Progress from "$lib/Progress.svelte";
+    import Container from "$lib/Container.svelte";
     import Notification from "$lib/Notification.svelte";
 
     const rules = PUBLIC_INSTANCE_RULES.split("\\n");
@@ -120,7 +121,6 @@
     });
 
     function drop(e: DragEvent) {
-        // fixme unknown assert
         if ([...e.dataTransfer!!.items].some((item) => item.kind === "file")) {
             e.preventDefault();
         }
@@ -160,20 +160,21 @@
 
     {#if rules.length > 0}
         <div class="my-4">
-            <div class="border-2 rounded border-ctp-red relative p-4">
-                <div
-                    class="absolute bg-bg italic text-ctp-red -top-2.5 text-sm px-1 flex gap-1 *:my-auto"
-                >
-                    <TriangleAlert class="h-4" />
-                    <div>instance rules</div>
-                </div>
-
+            {#snippet warning_icon()}
+                <TriangleAlert class="h-4" />
+            {/snippet}
+            <Container
+                icon={warning_icon}
+                title="instance rules"
+                border="border-ctp-red"
+                text="text-ctp-red"
+            >
                 <ul class="text-sm">
                     {#each rules as line}
                         <li>{line}</li>
                     {/each}
                 </ul>
-            </div>
+            </Container>
             <span class="text-xs text-ctp-subtext0 italic">
                 don't like these rules? <a href={PUBLIC_REPO_URL}
                     >host your own!</a
@@ -185,7 +186,7 @@
     <div class="text-center *:mx-auto">
         <label
             for="upload"
-            class="w-64 h-16 px-4 border-2 border-dotted border-ctp-lavender my-4 flex justify-center items-center flex-col gap-3"
+            class="w-64 h-16 px-4 border-2 border-dashed border-ctp-lavender my-4 flex justify-center items-center flex-col gap-3"
             ondrop={drop}
             ondragover={dragOver}
         >
