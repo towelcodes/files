@@ -1,4 +1,10 @@
 export function isBrowser(headers: Headers): boolean {
+  const userAgent = headers.get("user-agent") ?? "";
+  // if the user agent is discordbot, always return the file content
+  if (userAgent.includes("Discordbot")) {
+    return false;
+  }
+
   const accept = headers.get("accept") ?? "";
   const sec = headers.get("sec-fetch-mode") ?? ""; // sec.length > 0
   if (accept.includes("text/html")) {
@@ -49,8 +55,8 @@ export async function createUpload(size: number, key?: string) {
     method: "POST",
     body: JSON.stringify(body),
     headers: {
-      "Content-Type": "applicaiton/json"
-    }
+      "Content-Type": "applicaiton/json",
+    },
   });
 
   if (res.status != 200) {
