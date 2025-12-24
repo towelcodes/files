@@ -5,30 +5,38 @@ import { env as privateEnv } from "$env/dynamic/private";
 import { client, createUniqueId } from "$lib/server/s3";
 import { error } from "@sveltejs/kit";
 
-export const POST: RequestHandler = async ({ request, getClientAddress }) => {
-  let key = "";
-  let size = 0;
-  try {
-    const json = await request.json();
-    key = json.key ?? (await createUniqueId());
+interface UploadRequest {
+  filename: string;
+  key?: string;
+  size: number;
+}
 
-    if (json.size == undefined) {
-      error(400, {
-        message: "missing `size` property",
-      });
-    } else if (env.PUBLIC_MAX_SIZE != undefined) {
-      if (json.size > parseInt(env.PUBLIC_MAX_SIZE)) {
-        error(413, {
-          message: "content is larger than this instance supports",
-        });
-      }
-    }
-    size = json.size;
+export const POST: RequestHandler = async ({ request, getClientAddress }) => {
+  let uploadRequest: UploadRequest;
+  try {
+    uploadRequest = await request.json();
   } catch {
     error(400, {
       message: "missing json body",
     });
   }
+
+  if (uploadRequest.size == undefined) {
+    error(400, {
+      message: "missing `size` property",
+    });
+  } else if (env.PUBLIC_MAX_SIZE != undefined) {
+    if (uploadRequest.size > parseInt(env.PUBLIC_MAX_SIZE)) {
+      error(413, {
+        message: "content is larger than this instance supports",
+      });
+    }
+  }
+
+  const key =
+    uploadRequest.key ??
+    (await createUniqueId()) + `.${uploadRequest.filename.split(".").at(-1)}`;
+  const size = uploadRequest.size;
 
   const url = new URL(`https://${S3_BUCKET}.${S3_ENDPOINT}/${key}`);
   const signed = await client.sign(

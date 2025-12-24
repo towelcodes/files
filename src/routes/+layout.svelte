@@ -19,6 +19,6 @@
 {@render children?.()}
 
 <footer class="text-ctp-subtext0 text-xs font-pixel text-center mt-4">
-    teatowel powered 2025 ♥ <br />
+    <a href="https://towel.codes">towel.codes 2025</a> ♥ <br />
     <a href={PUBLIC_REPO_URL}>view source code</a>
 </footer>

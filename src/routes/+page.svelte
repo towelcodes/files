@@ -37,7 +37,7 @@
 
         // create the upload
         try {
-            const { key, signed } = await createUpload(file.size);
+            const { key, signed } = await createUpload(file.size, file.name);
             const req = new XMLHttpRequest();
             req.open("PUT", signed);
             req.setRequestHeader("Content-Type", file.type);

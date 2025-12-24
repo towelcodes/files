@@ -46,9 +46,14 @@ export async function hmacSign(keyStr: string, msg: string) {
     .join("");
 }
 
-export async function createUpload(size: number, key?: string) {
+export async function createUpload(
+  size: number,
+  filename: string,
+  key?: string,
+) {
   const body = {
     size,
+    filename,
     key,
   };
   const res = await fetch("/api/upload/create", {
