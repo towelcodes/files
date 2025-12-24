@@ -1,11 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cal+Sans&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 @import "@catppuccin/tailwindcss/mocha.css";
-
-@font-face {
-    font-family: "MS UI Gothic";
-    src: url("/font/MS-UIGothic.woff2") format("woff2");
-}
 
 @font-face {
     font-family: "Zpix";
@@ -15,8 +10,12 @@
 @theme {
     --color-bg: var(--color-ctp-mantle);
     --font-mono: "DM Mono", "JetBrains Mono", monospace;
-    --font-sans: "MS UI Gothic", "Verdana", system-ui, sans-serif;
+    --font-sans: "Inter", "Verdana", system-ui, sans-serif;
+    --font-display: "Cal Sans", "Inter", system-ui, sans-serif;
     --font-pixel: "Zpix", "nec_apc3";
+
+    --radius: 12px;
+    --radius-sm: 10px;
 
     @keyframes bg {
         0%,
@@ -33,10 +32,19 @@
 }
 
 @layer base {
+    html {
+        @apply h-full w-full;
+    }
+
     body {
-        @apply text-ctp-text bg-bg;
+        @apply text-ctp-text
+        bg-bg
+        w-full
+        h-full
+        m-0;
         image-rendering: pixelated;
     }
+
     a {
         @apply underline hover:no-underline;
     }
