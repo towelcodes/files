@@ -8,7 +8,7 @@
 }
 
 @theme {
-    --color-bg: var(--color-ctp-mantle);
+    --color-bg: var(--color-ctp-base);
     --font-mono: "DM Mono", "JetBrains Mono", monospace;
     --font-sans: "Inter", "Verdana", system-ui, sans-serif;
     --font-display: "Cal Sans", "Inter", system-ui, sans-serif;
@@ -17,16 +17,10 @@
     --radius: 12px;
     --radius-sm: 10px;
 
-    @keyframes bg {
-        0%,
-        100% {
-        }
-    }
-
-    --animate-spin: spin 1s ease-in-out infinite;
-    @keyframes spin {
+    --animate-hover: hover 0.7s ease-in;
+    @keyframes hover {
         to {
-            transform: rotate(360deg);
+            transform: scale(1.2);
         }
     }
 }
@@ -40,8 +34,7 @@
         @apply text-ctp-text
         bg-bg
         w-full
-        h-full
-        m-0;
+        h-full;
         image-rendering: pixelated;
     }
 

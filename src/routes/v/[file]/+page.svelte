@@ -1,8 +1,36 @@
 <script lang="ts">
     import { env } from "$env/dynamic/public";
-    import { Eye, Download, TriangleAlert, Plus } from "@lucide/svelte";
+    import {
+        Eye,
+        Download,
+        Flag,
+        Link,
+        Trash,
+        Pencil,
+        TriangleAlert,
+        Plus,
+    } from "@lucide/svelte";
     import type { PageProps } from "./$types";
+    import Button from "$lib/Button.svelte";
     let { data, form }: PageProps = $props();
+
+    const properties = [
+        ["filename", "sigma-ligma.mp4"],
+        ["size", "1000MB"],
+        ["date", "Dec 25 2025"],
+        ["time", "12:04:41 UTC"],
+        ["uploader", "Anonymous"],
+    ];
+
+    function download() {}
+
+    function report() {}
+
+    function edit() {}
+
+    function del() {}
+
+    function copyUrl() {}
 </script>
 
 <svelte:head>
@@ -28,46 +56,104 @@
     {/if}
 </svelte:head>
 
-<div class="flex text-center justify-center items-center mt-4">
-    <div class="w-max md:w-4/5 lg:w-2/3 p-4 border-2 border-ctp-mauve">
+<div
+    class="w-full h-full flex items-center justify-around flex-col md:flex-row gap-6 px-8"
+>
+    <div class="flex flex-1 flex-col gap-2">
+        <!-- title and buttons -->
+        <div class="flex gap-2">
+            <div class="rounded bg-ctp-crust w-min px-4 py-2 grow my-auto">
+                <h1 class="text-4xl font-display text-ctp-subtext0 italic">
+                    [untitled]
+                </h1>
+                <div class="text-sm text-ctp-subtext0 text-nowrap">
+                    by anonymous #abdq241
+                </div>
+            </div>
+            <div class="flex flex-col gap-1 justify-around">
+                <!-- buttons -->
+                <div class="flex gap-1 mx-auto">
+                    {#snippet download_icon()}
+                        <Download />
+                    {/snippet}
+                    <Button classes="bg-ctp-green" icon={download_icon}
+                        >Download</Button
+                    >
+
+                    {#snippet report_icon()}
+                        <Flag />
+                    {/snippet}
+                    <Button classes="bg-ctp-maroon" icon={report_icon} />
+
+                    {#snippet edit_icon()}
+                        <Pencil />
+                    {/snippet}
+                    <Button classes="bg-ctp-surface1" icon={edit_icon} />
+
+                    {#snippet delete_icon()}
+                        <Trash />
+                    {/snippet}
+                    <Button classes="bg-ctp-surface1" icon={delete_icon} />
+                </div>
+
+                <!-- url -->
+                <div
+                    class="relative bg-ctp-crust text-ctp-subtext0 font-mono text-sm w-full rounded-sm py-2 px-2 text-nowrap overflow-x-auto"
+                >
+                    {#snippet link_icon()}
+                        <Link class="h-5 w-4" />
+                    {/snippet}
+                    <Button
+                        classes="absolute text-ctp-text! bg-ctp-surface0 right-0 top-0"
+                        icon={link_icon}
+                    />
+                    {env.PUBLIC_BASE_URL}/u/{data.file}
+                </div>
+            </div>
+        </div>
+
+        <!-- preview -->
+        <div class="bg-ctp-crust rounded px-4 py-4">
+            <div class="max-w-2xl mx-auto">
+                {#if data.contentType.startsWith("image")}
+                    <img src={`/u/${data.file}`} alt="" />
+                {/if}
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-col gap-6 w-min">
         <div
-            class="flex gap-2 text-ctp-crust font-bold font-mono absolute top-1"
+            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-6 w-sm"
         >
-            <div class="flex *my:auto gap-2 py-1 px-2 bg-ctp-mauve w-min">
-                <Eye />
-                <div>Preview</div>
+            <h2 class="font-display text-4xl absolute -top-6 bg-bg px-1">
+                properties
+            </h2>
+            <div class="flex flex-col gap-1">
+                {#each properties as [property, value]}
+                    <div class="flex *:py-1">
+                        <div
+                            class="relative z-10 rounded-sm w-[12em] bg-ctp-mantle font-bold text-center -mr-2"
+                        >
+                            {property}
+                        </div>
+                        <div
+                            class="rounded-sm w-full bg-ctp-crust font-mono text-sm -ml-2 pl-7 leading-6"
+                        >
+                            {value}
+                        </div>
+                    </div>
+                {/each}
             </div>
-            <a
-                class="bg-ctp-maroon px-2 hover:cursor-pointer"
-                href="/u/{data.file}"
-                download={data.file}
-            >
-                <Download />
-            </a>
-            <a class="bg-ctp-maroon px-2 hover:cursor-pointer" href="/">
-                <Plus />
-            </a>
         </div>
-        <div class="p-2 text-left font-bold font-mono flex *:my-auto gap-2">
-            <div class="flex">
-                <a href="/v/{data.file}" class="no-underline">{data.file}</a>
-            </div>
-            <span class="bg-ctp-surface1 text-sm px-2">{data.contentType}</span>
-            <span class="bg-ctp-blue text-sm text-ctp-crust px-2"
-                >{data.lastModified}</span
+        <div
+            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-5 w-sm"
+        >
+            <h2 class="font-display text-4xl absolute -top-6 bg-bg px-1">
+                about
+            </h2>
+            <i class="text-ctp-subtext0"
+                >The uploader did not provide any additional information.</i
             >
-        </div>
-        <div>
-            {#if data.contentType.startsWith("image")}
-                <img src={`/u/${data.file}`} alt="uploaded file" />
-            {:else if data.contentType.startsWith("video")}
-                <video width="320" height="240" controls>
-                    <source src={`/u/${data.file}`} type={data.contentType} />
-                    your browser does not support previewing this video type.
-                </video>
-            {:else}
-                <p>[no preview avaliable]</p>
-            {/if}
         </div>
     </div>
 </div>
