@@ -12,11 +12,12 @@
     } from "@lucide/svelte";
     import type { PageProps } from "./$types";
     import Button from "$lib/Button.svelte";
-    let { data, form }: PageProps = $props();
+    import { prettyNumber } from "$lib/util";
+    let { data }: PageProps = $props();
 
     const properties = [
         ["filename", data.file],
-        ["size", "1000MB"],
+        ["size", `${prettyNumber(data.size)}B`],
         ["date", data.lastModified],
         ["type", data.contentType],
     ];
@@ -82,10 +83,10 @@
         <div class="flex gap-2">
             <div class="rounded bg-ctp-crust w-min px-4 py-2 grow my-auto">
                 <h1 class="text-4xl font-display text-ctp-subtext0 italic">
-                    [untitled]
+                    {data.file}
                 </h1>
                 <div class="text-sm text-ctp-subtext0 text-nowrap">
-                    by anonymous #abdq241
+                    by {data.uploader}
                 </div>
             </div>
             <div class="flex flex-col gap-1 justify-around">

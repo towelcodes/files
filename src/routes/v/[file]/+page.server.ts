@@ -18,6 +18,8 @@ export const load: PageServerLoad = async ({ params, request, platform }) => {
   return {
     file: params.file,
     lastModified: object.headers.get("Last-Modified"),
+    size: parseInt(object.headers.get("Content-Length")!!),
+    uploader: "anonymous",
     contentType:
       object.headers.get("Content-Type") ?? "application/octet-stream",
   };
