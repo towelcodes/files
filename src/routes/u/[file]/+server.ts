@@ -16,6 +16,7 @@ export const GET: RequestHandler = async ({ request, params, platform }) => {
 
     return new Response(object.body as any, {
       headers: {
+        "Acess-Control-Allow-Origin": "*",
         "Content-Type":
           object.headers.get("Content-Type") ?? "application/octet-stream",
       },
