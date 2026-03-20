@@ -17,6 +17,8 @@
     --radius: 12px;
     --radius-sm: 10px;
 
+    --text-shadow-text: 4px 4px 0px rgb(0, 0, 0);
+
     --animate-hover: hover 0.7s ease-in;
     @keyframes hover {
         to {

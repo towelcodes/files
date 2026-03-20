@@ -13,6 +13,7 @@
     import type { PageProps } from "./$types";
     import Button from "$lib/Button.svelte";
     import { prettyNumber } from "$lib/util";
+    import FilePreview from "$lib/FilePreview.svelte";
     let { data }: PageProps = $props();
 
     const properties = [
@@ -76,13 +77,13 @@
 {/snippet}
 
 <div
-    class="w-full h-full flex items-center justify-around flex-col md:flex-row gap-6 px-8"
+    class="w-full md:h-full flex items-center justify-around flex-col md:flex-row gap-6 px-8"
 >
-    <div class="flex flex-1 flex-col gap-2">
+    <div class="flex md:flex-1 flex-col gap-2">
         <!-- title and buttons -->
         <div class="flex gap-2">
             <div class="rounded bg-ctp-crust w-min px-4 py-2 grow my-auto">
-                <h1 class="text-4xl font-display text-ctp-subtext0 italic">
+                <h1 class="text-4xl font-display text-ctp-blue">
                     {data.file}
                 </h1>
                 <div class="text-sm text-ctp-subtext0 text-nowrap">
@@ -129,50 +130,15 @@
         </div>
 
         <!-- preview -->
-        <div class="bg-ctp-crust rounded px-4 py-4">
-            <div class="max-w-2xl mx-auto">
-                {#if data.contentType.startsWith("image")}
-                    <img
-                        src={`/u/${data.file}`}
-                        alt=""
-                        class="max-h-[32em] mx-auto"
-                    />
-                {:else if data.contentType.startsWith("video")}
-                    <video width="320" height="240" class="mx-auto" controls>
-                        <source
-                            src={`/u/${data.file}`}
-                            type={data.contentType}
-                        />
-                        your browser does not support previewing this video type.
-                    </video>
-                {:else}
-                    <div class="w-full text-center">
-                        <div class="flex flex-col">
-                            <div
-                                class="grow flex items-center justify-center py-4"
-                            >
-                                <div
-                                    class="rounded-full bg-ctp-mantle w-20 h-20 text-4xl font-bold flex items-center justify-center"
-                                >
-                                    <h1 class="text-ctp-maroon">?</h1>
-                                </div>
-                            </div>
-                        </div>
-
-                        <h3 class="text-ctp-subtext0 mb-2">
-                            this file type can't be previewed yet.
-                        </h3>
-                        <div class="[&_button]:mx-auto my-4">
-                            {@render download_button()}
-                        </div>
-                    </div>
-                {/if}
-            </div>
-        </div>
+        <FilePreview
+            file={data.file}
+            contentType={data.contentType}
+            {download_button}
+        />
     </div>
     <div class="flex flex-col gap-6 w-min">
         <div
-            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-6 w-sm"
+            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-6 w-lg md:w-sm"
         >
             <h2 class="font-display text-4xl absolute -top-6 bg-bg px-1">
                 properties
@@ -195,7 +161,7 @@
             </div>
         </div>
         <div
-            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-5 w-sm"
+            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-5 w-lg md:w-sm"
         >
             <h2 class="font-display text-4xl absolute -top-6 bg-bg px-1">
                 about
