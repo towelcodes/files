@@ -1,5 +1,6 @@
 import type { RequestHandler } from "./$types";
 import { S3_ENDPOINT, S3_BUCKET } from "$env/static/private";
+import { PUBLIC_BASE_URL } from "$env/static/public";
 import { env } from "$env/dynamic/public";
 import { env as privateEnv } from "$env/dynamic/private";
 import { client, createUniqueId } from "$lib/server/s3";
@@ -75,6 +76,9 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
                   value: getClientAddress(),
                 },
               ],
+              image: {
+                url: `${PUBLIC_BASE_URL}/u/${key}`,
+              },
             },
           ],
         }),
