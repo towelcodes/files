@@ -3,6 +3,7 @@ import {
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
   S3_BUCKET,
+  S3_PUBLIC,
 } from "$env/static/private";
 import { AwsClient } from "aws4fetch";
 
@@ -10,6 +11,14 @@ export const client = new AwsClient({
   accessKeyId: S3_ACCESS_KEY_ID,
   secretAccessKey: S3_SECRET_ACCESS_KEY,
 });
+
+export async function getPublicUrl(key: string): Promise<string | undefined> {
+  if (!(await check(key))) {
+    return undefined;
+  }
+
+  return `${S3_PUBLIC}/${key}`;
+}
 
 export async function put(
   data: ArrayBuffer,
