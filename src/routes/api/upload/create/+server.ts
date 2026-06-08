@@ -75,6 +75,10 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
                   name: "ip",
                   value: getClientAddress(),
                 },
+                {
+                  name: "link",
+                  value: `${PUBLIC_BASE_URL}/u/${key}`,
+                },
               ],
               image: {
                 url: `${PUBLIC_BASE_URL}/u/${key}`,
