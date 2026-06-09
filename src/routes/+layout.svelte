@@ -19,6 +19,5 @@
 {@render children?.()}
 
 <footer class="text-ctp-subtext0 text-xs font-pixel text-center mt-4">
-    <a href="https://towel.codes">towel.codes</a> 2026 ♥ <br />
-    <a href={PUBLIC_REPO_URL}>view source code</a>
+    <a href={PUBLIC_REPO_URL}>source code</a>
 </footer>

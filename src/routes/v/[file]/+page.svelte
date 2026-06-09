@@ -1,19 +1,11 @@
 <script lang="ts">
     import { env } from "$env/dynamic/public";
-    import {
-        Eye,
-        Download,
-        Flag,
-        Link,
-        Trash,
-        Pencil,
-        TriangleAlert,
-        Plus,
-    } from "@lucide/svelte";
+    import { Download, Flag, Link, Trash, Pencil } from "@lucide/svelte";
     import type { PageProps } from "./$types";
     import Button from "$lib/Button.svelte";
     import { prettyNumber } from "$lib/util";
     import FilePreview from "$lib/FilePreview.svelte";
+    import { PUBLIC_BASE_URL } from "$env/static/public";
     let { data }: PageProps = $props();
 
     const properties = [
@@ -22,6 +14,19 @@
         ["date", data.lastModified],
         ["type", data.contentType],
     ];
+
+    async function download() {
+        const response = await fetch(data.raw + "?d");
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = data.file;
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
 
     function report() {}
 
@@ -69,11 +74,13 @@
     <Download />
 {/snippet}
 {#snippet download_button()}
-    <a href="/u/{data.file}" download={data.file} class="no-underline w-min">
-        <Button classes="bg-ctp-green w-min" icon={download_icon}
-            >Download</Button
-        >
-    </a>
+    <!-- <a href={data.raw} download={data.file} class="no-underline w-min"> -->
+    <Button
+        classes="bg-ctp-green w-min"
+        icon={download_icon}
+        callback={download}>Download</Button
+    >
+    <!-- </a> -->
 {/snippet}
 
 <div
@@ -132,6 +139,7 @@
         <!-- preview -->
         <FilePreview
             file={data.file}
+            raw={data.raw}
             contentType={data.contentType}
             {download_button}
         />
