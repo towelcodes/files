@@ -121,18 +121,20 @@
     });
 
     function drop(e: DragEvent) {
-        if ([...e.dataTransfer!!.items].some((item) => item.kind === "file")) {
+        if (e.dataTransfer && e.dataTransfer.files.length > 0) {
             e.preventDefault();
+            files = e.dataTransfer.files;
         }
     }
 
     function dragOver(e: DragEvent) {
-        const fileItems = [...e.dataTransfer!!.items].filter(
+        if (!e.dataTransfer) return;
+        const fileItems = [...e.dataTransfer.items].filter(
             (item) => item.kind === "file",
         );
         if (fileItems.length > 0) {
             e.preventDefault();
-            e.dataTransfer!!.dropEffect = "copy";
+            e.dataTransfer.dropEffect = "copy";
         }
     }
 </script>
@@ -187,8 +189,6 @@
         <label
             for="upload"
             class="w-64 h-16 px-4 border-2 border-dashed border-ctp-lavender my-4 flex justify-center items-center flex-col gap-3"
-            ondrop={drop}
-            ondragover={dragOver}
         >
             <div class="flex gap-2 *:my-auto">
                 {#if filename == ""}
@@ -250,3 +250,5 @@
         </div>
     </div>
 </div>
+
+<svelte:window ondragover={dragOver} ondrop={drop} />
