@@ -4,6 +4,7 @@
         PUBLIC_INSTANCE_TAGLINE,
         PUBLIC_INSTANCE_RULES,
         PUBLIC_REPO_URL,
+        PUBLIC_BASE_URL,
     } from "$env/static/public";
     import { env } from "$env/dynamic/public";
     import { goto } from "$app/navigation";
@@ -18,6 +19,8 @@
     import Progress from "$lib/Progress.svelte";
     import Container from "$lib/Container.svelte";
     import Notification from "$lib/Notification.svelte";
+    import { onMount } from "svelte";
+    import { fade, slide } from "svelte/transition";
 
     const rules = PUBLIC_INSTANCE_RULES.split("\\n");
 
@@ -29,6 +32,16 @@
     let progress: { loaded: number; total: number } | undefined = $state();
 
     let error: { title: string; description: string } | undefined = $state();
+
+    let recentUploads: string[] = $state([]);
+
+    onMount(() => {
+        const localStorage = window.localStorage;
+        localStorage.getItem("recentUploads") &&
+            (recentUploads = JSON.parse(
+                localStorage.getItem("recentUploads")!!,
+            ));
+    });
 
     async function upload() {
         if (!files) return;
@@ -48,27 +61,23 @@
                             loaded: e.loaded,
                             total: e.total,
                         };
-                        console.log(
-                            "upload: ",
-                            e.loaded,
-                            e.total,
-                            e.loaded / e.total,
-                        );
                     }
                 });
-                req.upload.addEventListener("loadend", () => {
-                    console.log("loadend");
-                });
                 req.addEventListener("readystatechange", () => {
-                    console.log("readyState", req.readyState);
                     if (req.readyState == 4) {
                         resolve(req.response);
                     }
                 });
                 req.send(file);
             });
-            console.log("completed: ", req.readyState, req.status);
-            goto(`/v/${key}`);
+
+            recentUploads.unshift(key);
+            window.localStorage.setItem(
+                "recentUploads",
+                JSON.stringify(recentUploads),
+            );
+
+            clear();
         } catch (e: any) {
             console.error(e);
             error = {
@@ -86,32 +95,25 @@
     }
 
     $effect(() => {
-        // FIXME tidy this up
-        if (files) {
-            console.log(files);
-            if (files.length > 0) {
-                filename = files[0].name;
+        const file = files?.item(0);
+        const maxSize = env.PUBLIC_MAX_SIZE;
 
-                if (env.PUBLIC_MAX_SIZE != undefined) {
-                    if (files[0].size > parseInt(env.PUBLIC_MAX_SIZE)) {
-                        uploadButton!!.disabled = true;
-                        clearButton!!.disabled = false;
-                        error = {
-                            title: "cannot upload this file",
-                            description: `size is too big (max: ${env.PUBLIC_MAX_SIZE} bytes)`,
-                        };
-                    } else {
-                        uploadButton!!.disabled = false;
-                        clearButton!!.disabled = false;
-                    }
-                } else {
-                    uploadButton!!.disabled = false;
-                    clearButton!!.disabled = false;
-                }
-            } else {
-                filename = "";
+        if (file) {
+            filename = file.name;
+
+            if (maxSize != undefined && file.size > parseInt(maxSize)) {
                 uploadButton!!.disabled = true;
-                clearButton!!.disabled = true;
+                clearButton!!.disabled = false;
+                error = {
+                    title: "cannot upload this file",
+                    description: `size is too big (max: ${maxSize} bytes)`,
+                };
+            } else {
+                uploadButton!!.disabled = false;
+                clearButton!!.disabled = false;
+                if (error?.title === "cannot upload this file") {
+                    error = undefined;
+                }
             }
         } else {
             filename = "";
@@ -249,6 +251,27 @@
             </button>
         </div>
     </div>
+
+    <!-- recent uploads -->
+    {#if recentUploads.length > 0}
+        <div transition:fade={{ duration: 200 }}>
+            <h2 class="text-ctp-subtext0 italic text-sm mb-4 mt-8">
+                recent uploads
+            </h2>
+            <div class="flex gap-2 flex-wrap">
+                {#each recentUploads as upload}
+                    <a
+                        href={`/v/${upload}`}
+                        class="flex items-center gap-2 rounded border-2 border-ctp-mantle px-3 py-1 text-sm"
+                        transition:slide={{ duration: 200 }}
+                    >
+                        <File class="stroke-ctp-subtext0" />
+                        {upload}
+                    </a>
+                {/each}
+            </div>
+        </div>
+    {/if}
 </div>
 
 <svelte:window ondragover={dragOver} ondrop={drop} />

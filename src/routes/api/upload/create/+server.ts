@@ -4,6 +4,7 @@ import { PUBLIC_BASE_URL } from "$env/static/public";
 import { env } from "$env/dynamic/public";
 import { env as privateEnv } from "$env/dynamic/private";
 import { client, createUniqueId } from "$lib/server/s3";
+import { prettyNumber } from "$lib/util";
 import { error } from "@sveltejs/kit";
 
 interface UploadRequest {
@@ -69,7 +70,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
               fields: [
                 {
                   name: "size",
-                  value: size,
+                  value: prettyNumber(size),
                 },
                 {
                   name: "ip",
