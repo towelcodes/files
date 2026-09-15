@@ -10,9 +10,10 @@
 
     interface Props {
         user: User | null;
+        isAdmin?: boolean;
     }
 
-    let { user }: Props = $props();
+    let { user, isAdmin = false }: Props = $props();
 </script>
 
 <nav>
@@ -25,6 +26,13 @@
         </a>
 
         <div class="px-2 flex gap-2 items-center">
+            {#if isAdmin}
+                <div class="bg-ctp-surface0 rounded px-2 py-1 flex gap-2 items-center text-ctp-subtext0 clicky">
+                    <a href="/admin" class="no-underline hover:text-ctp-text">
+                        admin
+                    </a>
+                </div>
+            {/if}
             {#if user}
                 <div class="bg-ctp-surface0 rounded px-2 py-1 flex gap-2 items-center">
                     <img

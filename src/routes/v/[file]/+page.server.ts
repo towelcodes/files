@@ -4,6 +4,7 @@ import { isBrowser } from "$lib/util";
 import { check, getPublicUrl } from "$lib/server/s3";
 import { verifySession } from "$lib/server/session";
 import { getFilesRepo } from "$lib/server/get-files-repo";
+import { isAdmin } from "$lib/server/admin";
 import { DISCORD_SESSION_SECRET } from "$env/static/private";
 
 export const load: PageServerLoad = async ({
@@ -52,5 +53,6 @@ export const load: PageServerLoad = async ({
             : undefined,
         }
       : null,
+    isAdmin: isAdmin(user?.id),
   };
 };

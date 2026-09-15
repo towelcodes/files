@@ -117,7 +117,7 @@
     <!-- </a> -->
 {/snippet}
 
-<Banner user={data.user} />
+<Banner user={data.user} isAdmin={data.isAdmin} />
 
 <div
     class="w-full md:px-64 mt-8 flex items-center justify-around flex-col md:flex-row gap-6 px-8"

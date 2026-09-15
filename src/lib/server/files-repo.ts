@@ -31,6 +31,9 @@ export interface FilesRepo {
   /** Fetch metadata for a single key, or null if it doesn't exist. */
   get(key: string): Promise<FileMeta | null>;
 
+  /** Return all files, newest first. */
+  listAll(): Promise<FileMeta[]>;
+
   /** Return all files that have expired at or before `now` (epoch ms). */
   listExpired(now: number): Promise<FileMeta[]>;
 

@@ -154,7 +154,7 @@
     }
 </script>
 
-<Banner user={data.user} />
+<Banner user={data.user} isAdmin={data.isAdmin} />
 
 <div class="mt-8 container lg:max-w-2xl! mx-auto">
     <!-- rules -->

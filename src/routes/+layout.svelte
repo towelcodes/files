@@ -16,6 +16,6 @@
     />
 </svelte:head>
 
-<div class="mt-4 md:mx-0 mx-2">
+<div class="mt-4 md:mx-0 mx-2 w-full h-full">
     {@render children?.()}
 </div>

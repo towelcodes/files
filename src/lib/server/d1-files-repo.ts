@@ -53,6 +53,18 @@ export class D1FilesRepo implements FilesRepo {
     return results.map(rowToMeta);
   }
 
+  async listAll(): Promise<FileMeta[]> {
+    const { results } = await this.db
+      .prepare(
+        `SELECT key, filename, size, content_type, uploader_id,
+                title, description, expires_at, created_at
+         FROM files ORDER BY created_at DESC`,
+      )
+      .all<Row>();
+
+    return results.map(rowToMeta);
+  }
+
   async delete(key: string): Promise<void> {
     await this.db.prepare(`DELETE FROM files WHERE key = ?`).bind(key).run();
   }
