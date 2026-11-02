@@ -5,27 +5,37 @@
     import { env } from "$env/dynamic/public";
 
     /* token: bindable, holds the solved cap token ("" until solved) */
-    let { token = $bindable("") } = $props();
+    let { token = $bindable(""), next = $bindable(0) } = $props();
 
     type Status = "idle" | "verifying" | "success" | "error";
     let status: Status = $state("idle");
 
     const endpoint = env.PUBLIC_CAP_ENDPOINT;
 
+    async function solve() {
+          const cap = new Cap({ apiEndpoint: endpoint });
+          status = "verifying";
+          try {
+              const { token: t } = await cap.solve();
+              token = t;
+              status = "success";
+          } catch (e) {
+              console.error("cap solve failed", e);
+              status = "error";
+          }
+    }
+
     onMount(async () => {
         if (!endpoint) return;
-
-        const cap = new Cap({ apiEndpoint: endpoint });
-        status = "verifying";
-        try {
-            const { token: t } = await cap.solve();
-            token = t;
-            status = "success";
-        } catch (e) {
-            console.error("cap solve failed", e);
-            status = "error";
-        }
+        await solve();
     });
+
+    $effect(() => {
+      if (next != 0) {
+        solve();
+      }
+    });
+
 </script>
 
 {#if endpoint}

@@ -45,6 +45,7 @@
     let expiry = $state("-1");
     let preserveFilename = $state(true);
     let capToken = $state("");
+    let capNext = $state(0);
 
     let canUpload = $state(false);
     let canClear = $state(false);
@@ -90,6 +91,7 @@
             );
 
             clear();
+            capNext++;
         } catch (e: any) {
             console.error(e);
             error = {
@@ -307,7 +309,7 @@
                     label: "1h", value: "3600",
                 }]} bind:value={expiry} />
                 {#if captchaEnabled}
-                    <CapWidget bind:token={capToken} />
+                    <CapWidget bind:token={capToken} bind:next={capNext} />
                 {/if}
             </div>
         </div>
