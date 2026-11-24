@@ -29,6 +29,7 @@
     "@lucide/svelte": "^0.546.0",
     "@types/node": "^24.8.1",
     "aws4fetch": "^1.0.20",
-    "cap-widget": "^0.1.57"
+    "cap-widget": "^0.1.57",
+    "wrangler": "^4.167.0"
   }
 }
