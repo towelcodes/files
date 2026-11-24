@@ -92,10 +92,21 @@ export const POST: RequestHandler = async ({
     cookies.get("session"),
     DISCORD_SESSION_SECRET,
   );
+
+  // uesrs with not account can only store files for 7 days
+  if (!user &&
+    (uploadRequest.expiry != undefined && uploadRequest.expiry > 7 * 24 * 60 * 60) ||
+    !uploadRequest.expiry) {
+    error(401, {
+      message: `you need to sign in to upload a file with this expiry date`
+    });
+  }
+
   const expiresAt =
     uploadRequest.expiry != undefined && uploadRequest.expiry > 0
       ? Date.now() + uploadRequest.expiry * 1000
       : null;
+
   await repo.create({
     key,
     // keep the original filename only when requested; otherwise use the key

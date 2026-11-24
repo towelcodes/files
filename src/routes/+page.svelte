@@ -11,6 +11,7 @@
         File,
         X,
         LoaderCircle,
+        Info,
     } from "@lucide/svelte";
     import { createUpload, prettyNumber } from "$lib/util";
     import Progress from "$lib/Progress.svelte";
@@ -42,7 +43,7 @@
     // options
     let title = $state("");
     let description = $state("");
-    let expiry = $state("-1");
+    let expiry = $state("604800");
     let preserveFilename = $state(true);
     let capToken = $state("");
     let capNext = $state(0);
@@ -298,16 +299,22 @@
                 <TextInput bind:value={description} placeholder="description" multiline />
                 <Checkbox bind:checked={preserveFilename} label="preserve filename?"/>
                 <MultiChoice options={[{
-                    label: "∞", value: "-1"
+                    label: "∞", value: "-1", enabled: data.user != null, tooltip: data.user ? null : "requires login",
                 }, {
-                    label: "30d", value: "2592000",
+                    label: "30d", value: "2592000", enabled: data.user != null, tooltip: data.user ? null : "requires login",
                 }, {
-                    label: "1d", value: "86400",
+                    label: "7d", value: "604800",
                 }, {
-                    label: "12h", value: "43200",
+                    label: "24h", value: "86400",
                 }, {
                     label: "1h", value: "3600",
                 }]} bind:value={expiry} />
+                {#if !data.user}
+                    <div class="flex items-center gap-2 text-sm">
+                        <Info class="w-4 h-4 stroke-ctp-subtext0" />
+                        <span class="text-ctp-subtext0">log in to keep files forever</span>
+                    </div>
+                {/if}
                 {#if captchaEnabled}
                     <CapWidget bind:token={capToken} bind:next={capNext} />
                 {/if}
