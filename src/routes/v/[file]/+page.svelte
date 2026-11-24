@@ -13,7 +13,7 @@
     let downloadProgress: number | undefined = $state();
 
     const properties = [
-        ["filename", data.filename],
+        ["name", data.filename],
         ["size", `${prettyNumber(data.size)}B`],
         ["date", data.lastModified],
         ["type", data.contentType],
@@ -120,9 +120,8 @@
 <Banner user={data.user} isAdmin={data.isAdmin} />
 
 <div
-    class="w-full md:px-64 mt-8 flex items-center justify-around flex-col md:flex-row gap-6 px-8"
->
-    <div class="flex md:flex-1 flex-col gap-2">
+    class="w-full md:px-96 mt-8 flex items-center justify-around flex-col gap-12 px-6">
+    <div class="flex md:flex-1 flex-col gap-2 w-full">
         <!-- title and buttons -->
         <div class="flex gap-2">
             <div class="rounded w-min px-4 py-2 grow my-auto">
@@ -133,35 +132,13 @@
                     by {data.uploader}
                 </div>
             </div>
-            <div class="flex flex-col gap-1 justify-around">
-                <!-- buttons -->
-                <div class="flex gap-1 ml-auto">
-                    {@render download_button()}
-
-                    {#snippet report_icon()}
-                        <Flag />
-                    {/snippet}
-                    <Button classes="bg-ctp-surface1" icon={report_icon} />
-                </div>
-
-                <!-- url -->
-                <div
-                    class="flex bg-ctp-crust text-ctp-subtext0 font-mono text-sm w-full rounded-sm py-2 px-2 text-nowrap overflow-x-auto"
-                    id="downloadUrl"
-                >
-                    <div class="pr-4">
-                        {env.PUBLIC_BASE_URL}/u/{data.file}
-                    </div>
-                    {#snippet link_icon()}
-                        <Link class="h-5 w-4" />
-                    {/snippet}
-                    <Button
-                        classes="text-ctp-text! border-ctp-surface0 bg-ctp-surface0 right-0 top-0 -m-2"
-                        icon={link_icon}
-                        callback={copyUrl}
-                    />
-                </div>
+            <div class="flex-col gap-1 justify-around hidden md:flex">
+                {@render download_button()}
             </div>
+        </div>
+
+        <div class="block md:hidden mx-auto">
+            {@render download_button()}
         </div>
 
         <!-- preview -->
@@ -172,9 +149,10 @@
             {download_button}
         />
     </div>
-    <div class="flex flex-col gap-6 w-min">
+
+    <div class="flex flex-col md:flex-row gap-6 w-full">
         <div
-            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-6 w-lg md:w-sm"
+            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-6"
         >
             <h2 class="font-display text-4xl absolute -top-6 bg-bg px-1">
                 properties
@@ -183,7 +161,7 @@
                 {#each properties as [property, value]}
                     <div class="flex *:py-1">
                         <div
-                            class="relative z-10 rounded-sm w-[12em] bg-ctp-mantle font-bold text-center -mr-2"
+                            class="relative z-10 rounded-sm w-[6em] bg-ctp-mantle font-bold text-center -mr-2"
                         >
                             {property}
                         </div>
@@ -197,7 +175,7 @@
             </div>
         </div>
         <div
-            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-5 w-lg md:w-sm"
+            class="relative rounded border-4 border-ctp-surface0 px-4 py-2 pt-5"
         >
             <h2 class="font-display text-4xl absolute -top-6 bg-bg px-1">
                 about

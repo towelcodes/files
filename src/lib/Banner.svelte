@@ -25,7 +25,7 @@
             </div>
         </a>
 
-        <div class="px-2 flex gap-2 items-center">
+        <div class="px-2 gap-2 items-center flex flex-col md:flex-row">
             {#if isAdmin}
                 <div class="bg-ctp-surface0 rounded px-2 py-1 flex gap-2 items-center text-ctp-subtext0 clicky">
                     <a href="/admin" class="no-underline hover:text-ctp-text">
